@@ -5,7 +5,7 @@ import { useSiteContent } from '../../content-context';
 import SiteHeader from '../../components/SiteHeader';
 import SiteFooter from '../../components/SiteFooter';
 import ProductWhatsapp from '../../components/ProductWhatsapp';
-import { isProductAvailable } from '../../../lib/product-availability';
+import { isProductAvailable, isSizeAvailable } from '../../../lib/product-availability';
 import ProductCard from '../../components/ProductCard';
 import { productWhatsappUrl } from '../../../lib/whatsapp';
 
@@ -21,10 +21,10 @@ export default function ProdutoPage({ params }) {
   useEffect(() => {
     if (!product) return;
     setSelectedImage(product.image);
-    setSize(product.sizes?.[0] || '');
+    setSize(product.sizes?.find((item) => isSizeAvailable(product, item)) || '');
     setColor(product.colors?.[0] || '');
     setModel(product.models?.[0] || '');
-  }, [product?.id]);
+  }, [product]);
 
   const gallery = useMemo(() => product ? [...new Set([product.image, ...(product.gallery || [])].filter(Boolean))] : [], [product]);
   if (!product) return <main><SiteHeader/><section className="notFound"><h1>Produto não encontrado</h1><a href="/produtos">Voltar às camisetas</a></section><SiteFooter/></main>;
@@ -44,7 +44,7 @@ export default function ProdutoPage({ params }) {
         <div className="detailPrice">R$ {product.price}</div><p>{product.description}</p>
         {product.models?.length > 0 && <Option title="MODELO" items={product.models} value={model} setValue={setModel}/>} 
         {product.colors?.length > 0 && <Option title="COR" items={product.colors} value={color} setValue={setColor}/>} 
-        {product.sizes?.length > 0 && <Option title="TAMANHO" items={product.sizes} value={size} setValue={setSize}/>} 
+        {product.sizes?.length > 0 && <Option title="TAMANHO" items={product.sizes} value={size} setValue={setSize} isDisabled={(item) => !isSizeAvailable(product, item)}/>} 
         <div className={stock ? 'stockAvailability' : 'stockAvailability out'}><span aria-hidden="true">{stock ? '✓' : '!'}</span>{stock ? 'Disponível' : 'Indisponível'}</div>
         {whatsapp ? <ProductWhatsapp contact={content.contact} product={product} options={{ model, color, size }}>◉ {content.contact.whatsappLabel || 'FALAR NO WHATSAPP'}</ProductWhatsapp> : <div className="whatsappPending"><strong>WHATSAPP EM CONFIGURAÇÃO</strong><span>O número de atendimento será disponibilizado em breve.</span></div>}
         <p className="catalogModeNote">Este site funciona como catálogo. O atendimento confirma disponibilidade, prazo e forma de pagamento.</p>
@@ -57,6 +57,6 @@ export default function ProdutoPage({ params }) {
   </main>;
 }
 
-function Option({ title, items, value, setValue }) {
-  return <div className="optionGroup"><label>{title}: <strong>{value}</strong></label><div>{items.map((item) => <button className={value === item ? 'selected' : ''} onClick={() => setValue(item)} key={item}>{item}</button>)}</div></div>;
+function Option({ title, items, value, setValue, isDisabled = () => false }) {
+  return <div className="optionGroup"><label>{title}: <strong>{value || 'Nenhum disponível'}</strong></label><div>{items.map((item) => <button disabled={isDisabled(item)} title={isDisabled(item) ? `${item} indisponível` : item} aria-label={isDisabled(item) ? `${item} indisponível` : item} className={isDisabled(item) ? 'unavailableOption' : value === item ? 'selected' : ''} onClick={() => setValue(item)} key={item}>{item}</button>)}</div></div>;
 }

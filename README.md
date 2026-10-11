@@ -80,3 +80,7 @@ No editor do produto, marque ou desmarque “Produto disponível”. Salve o ras
 Ao clicar no WhatsApp de um produto indisponível, aparece um modal perguntando se o visitante quer ser avisado. Ao confirmar, o WhatsApp abre uma mensagem com o produto e as opções escolhidas. O visitante precisa enviar a mensagem; o aviso de reposição será feito pela equipe.
 
 O preço com desconto no Pix foi retirado do catálogo e do editor; o checkout também não calcula mais os 5% de desconto.
+
+## Disponibilidade por tamanho
+
+No editor do produto, em “Disponibilidade por tamanho”, marque somente os tamanhos disponíveis. Salve e publique. Cada tamanho pode substituir a disponibilidade padrão do produto. O catálogo mostra disponível quando houver pelo menos um tamanho disponível. Tamanhos indisponíveis ficam riscados, com contorno vermelho tracejado e sem clique; o primeiro disponível é selecionado automaticamente. Se nenhum estiver disponível, o WhatsApp oferece solicitar aviso de reposição.

@@ -141,7 +141,7 @@ export function normalizeContent(value = {}) {
       ? source.products.map((item) => {
           const gallery = Array.isArray(item.gallery) ? item.gallery.filter(Boolean) : [];
           const image = item.image || gallery[0] || '';
-          return { ...item, available: isProductAvailable(item), pix: '', slug: item.slug || slugify(item.name || item.id), image, gallery: [...new Set([image, ...gallery].filter(Boolean))] };
+          return { ...item, available: typeof item.available === 'boolean' ? item.available : Number(item.stock) > 0, pix: '', slug: item.slug || slugify(item.name || item.id), image, gallery: [...new Set([image, ...gallery].filter(Boolean))] };
         })
       : DEFAULT_CONTENT.products,
   };
