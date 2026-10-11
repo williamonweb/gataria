@@ -2,13 +2,13 @@
 
 import { useRef } from 'react';
 import { productWhatsappUrl, whatsappUrl } from '../../lib/whatsapp';
-import { isProductAvailable } from '../../lib/product-availability';
+import { isSelectionAvailable } from '../../lib/product-availability';
 
 export default function ProductWhatsapp({ contact, product, options = {}, className = 'productWhatsapp', children }) {
   const dialog = useRef(null);
   const url = productWhatsappUrl(contact, product, options);
   if (!url) return null;
-  const available = isProductAvailable(product);
+  const available = isSelectionAvailable(product, options);
   const details = [
     `Olá! Quero ser avisado quando o produto ${product.name} estiver disponível novamente.`,
     product.sku ? `Código: ${product.sku}` : '',

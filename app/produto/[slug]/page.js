@@ -5,7 +5,7 @@ import { useSiteContent } from '../../content-context';
 import SiteHeader from '../../components/SiteHeader';
 import SiteFooter from '../../components/SiteFooter';
 import ProductWhatsapp from '../../components/ProductWhatsapp';
-import { isProductAvailable, isSizeAvailable } from '../../../lib/product-availability';
+import { isProductAvailable, isSizeAvailable, isColorAvailable } from '../../../lib/product-availability';
 import ProductCard from '../../components/ProductCard';
 import { productWhatsappUrl } from '../../../lib/whatsapp';
 
@@ -21,10 +21,15 @@ export default function ProdutoPage({ params }) {
   useEffect(() => {
     if (!product) return;
     setSelectedImage(product.image);
-    setSize(product.sizes?.find((item) => isSizeAvailable(product, item)) || '');
-    setColor(product.colors?.[0] || '');
+    const nextColor = product.colors?.find((item) => isColorAvailable(product, item)) || '';
+    setColor((current) => product.colors?.includes(current) && isColorAvailable(product, current) ? current : nextColor);
     setModel(product.models?.[0] || '');
   }, [product]);
+
+  useEffect(() => {
+    if (!product) return;
+    setSize((current) => product.sizes?.includes(current) && isSizeAvailable(product, current, color) ? current : product.sizes?.find((item) => isSizeAvailable(product, item, color)) || '');
+  }, [product, color]);
 
   const gallery = useMemo(() => product ? [...new Set([product.image, ...(product.gallery || [])].filter(Boolean))] : [], [product]);
   if (!product) return <main><SiteHeader/><section className="notFound"><h1>Produto não encontrado</h1><a href="/produtos">Voltar às camisetas</a></section><SiteFooter/></main>;
@@ -43,8 +48,8 @@ export default function ProdutoPage({ params }) {
         <span className="badge">{product.type}</span><h1>{product.name}</h1><div className="stars">★★★★★ <small>({product.rating || 0} avaliações)</small></div>
         <div className="detailPrice">R$ {product.price}</div><p>{product.description}</p>
         {product.models?.length > 0 && <Option title="MODELO" items={product.models} value={model} setValue={setModel}/>} 
-        {product.colors?.length > 0 && <Option title="COR" items={product.colors} value={color} setValue={setColor}/>} 
-        {product.sizes?.length > 0 && <Option title="TAMANHO" items={product.sizes} value={size} setValue={setSize} isDisabled={(item) => !isSizeAvailable(product, item)}/>} 
+        {product.colors?.length > 0 && <Option title="COR" items={product.colors} value={color} setValue={setColor} isDisabled={(item) => !isColorAvailable(product, item)}/>} 
+        {product.sizes?.length > 0 && <Option title="TAMANHO" items={product.sizes} value={size} setValue={setSize} isDisabled={(item) => (product.colors?.length > 0 && !color) || !isSizeAvailable(product, item, color)}/>} 
         <div className={stock ? 'stockAvailability' : 'stockAvailability out'}><span aria-hidden="true">{stock ? '✓' : '!'}</span>{stock ? 'Disponível' : 'Indisponível'}</div>
         {whatsapp ? <ProductWhatsapp contact={content.contact} product={product} options={{ model, color, size }}>◉ {content.contact.whatsappLabel || 'FALAR NO WHATSAPP'}</ProductWhatsapp> : <div className="whatsappPending"><strong>WHATSAPP EM CONFIGURAÇÃO</strong><span>O número de atendimento será disponibilizado em breve.</span></div>}
         <p className="catalogModeNote">Este site funciona como catálogo. O atendimento confirma disponibilidade, prazo e forma de pagamento.</p>
