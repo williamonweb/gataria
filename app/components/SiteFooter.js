@@ -13,7 +13,7 @@ export default function SiteFooter() {
     </div>
     <div><h4>CATÁLOGO</h4><a href="/produtos">Todas as camisetas</a><a href="/colecoes">Coleções</a><a href="/pagina/sobre">Sobre a Gataria</a></div>
     <div><h4>ATENDIMENTO</h4>{whatsapp && <a href={whatsapp} target="_blank" rel="noreferrer">◉ {content.contact.whatsapp}</a>}<a href={`mailto:${content.contact.email}`}>✉ {content.contact.email}</a><span className="footerText">⌖ {content.contact.hours}</span></div>
-    <div><h4>REDES SOCIAIS</h4><a href={content.instagram.url || '#'} target="_blank" rel="noreferrer">Instagram {content.instagram.username}</a><a href="/pagina/privacidade">Política de privacidade</a></div>
+    <div><h4>REDES SOCIAIS</h4><a href={content.instagram.url || '#'} target="_blank" rel="noreferrer">Instagram {content.instagram.username}</a><a href="/pagina/privacidade">Política de privacidade</a><a className="adminFooterLink" href="/admin">Painel administrativo</a></div>
     <div className="catalogNotice"><strong>CATÁLOGO ONLINE</strong><p>Escolha sua camiseta e fale diretamente com a Gataria. A compra pelo site será adicionada numa próxima etapa.</p></div>
     <p className="copyright">{content.footer.copyright}</p>
   </footer>;

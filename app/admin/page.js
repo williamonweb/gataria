@@ -55,7 +55,9 @@ export default function AdminPage() {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Não foi possível entrar.');
     setAuth((value) => ({ ...value, authenticated: true }));
-    await loadContent();
+    try { await loadContent(); } catch {
+      setMessage({ tone: 'error', text: 'Login realizado, mas o catálogo não carregou. Confira DATABASE_URL do Neon e faça um novo deploy.' });
+    }
   }
 
   async function logout() {

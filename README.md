@@ -60,3 +60,15 @@ Sem `DATABASE_URL`, a versão publicada continua exibindo o conteúdo padrão e 
 ## Compra online
 
 As rotas antigas do Mercado Pago foram mantidas no código como referência, mas não aparecem no catálogo. Quando a Gataria estiver pronta para vender pelo site, a próxima etapa será reativar o carrinho, criar pedidos no banco, calcular frete e conectar o webhook do Mercado Pago.
+
+## Login na Vercel
+
+O botão “Painel administrativo” fica no rodapé e abre `/admin`.
+
+Em Settings → Environment Variables do projeto correto, defina os nomes exatos `CMS_USERNAME`, `CMS_PASSWORD`, `CMS_SECRET` e `DATABASE_URL`. Os valores não devem ter aspas. Marque Production (e Preview se for testar em um endereço de preview). Depois faça um novo deploy: uma implantação anterior não recebe variáveis alteradas automaticamente.
+
+Entre com o valor de CMS_USERNAME e CMS_PASSWORD. O usuário não é uma conta da Vercel nem um usuário do banco Neon. A senha diferencia maiúsculas, minúsculas e espaços; o usuário ignora espaços nas extremidades.
+
+Se o login funcionar e o catálogo falhar, confira a conexão DATABASE_URL. Nunca compartilhe a senha, o CMS_SECRET ou a URL completa do banco.
+
+Use a pasta principal deste ZIP como raiz do projeto. A cópia antiga que estava dentro de gataria-store/gataria-store foi removida para evitar publicar o site antigo por engano.
