@@ -41,7 +41,7 @@ function buildItems(inputItems, checkoutMode, baseUrl) {
     const model = validateVariant(product, 'models', input.model);
     const color = validateVariant(product, 'colors', input.color);
     const size = validateVariant(product, 'sizes', input.size);
-    const unitPrice = parseBRL(checkoutMode === 'pix' ? product.pix || product.price : product.price);
+    const unitPrice = parseBRL(product.price);
     if (unitPrice <= 0) throw new Error(`Preço inválido para ${product.name}.`);
     const details = [model, color, size].filter(Boolean).join(' • ');
     const imageUrl = product.image?.startsWith('http') ? product.image : `${baseUrl}${product.image}`;

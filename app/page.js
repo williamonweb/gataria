@@ -3,6 +3,7 @@
 import { useSiteContent } from './content-context';
 import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
+import ProductWhatsapp from './components/ProductWhatsapp';
 import ProductCard from './components/ProductCard';
 import { productWhatsappUrl, whatsappUrl } from '../lib/whatsapp';
 
@@ -47,7 +48,7 @@ export default function Home() {
 
     {content.featured.active && featuredProduct && <section className="featured shell">
       <div className="weekProduct"><span className="seal">DESTAQUE<br/>GATARIA</span><img src={featuredProduct.image} alt={featuredProduct.name}/></div>
-      <div className="featuredInfo"><p className="featuredEyebrow">{content.featured.eyebrow}</p><h2>{featuredProduct.name}</h2><div className="stars">★★★★★ <small>({featuredProduct.rating || 0})</small></div><p>◈ {featuredProduct.material}</p><p>◈ {featuredProduct.print}</p><strong>R$ {featuredProduct.price}</strong>{featuredProduct.pix && <span>R$ {featuredProduct.pix} no PIX</span>}<a className="buyNow" href={`/produto/${featuredProduct.slug || featuredProduct.id}`}>VER DETALHES</a>{featuredWhatsapp && <a className="whatsappSecondary" href={featuredWhatsapp} target="_blank" rel="noreferrer">FALAR SOBRE ESTA CAMISETA</a>}</div>
+      <div className="featuredInfo"><p className="featuredEyebrow">{content.featured.eyebrow}</p><h2>{featuredProduct.name}</h2><div className="stars">★★★★★ <small>({featuredProduct.rating || 0})</small></div><p>◈ {featuredProduct.material}</p><p>◈ {featuredProduct.print}</p><strong>R$ {featuredProduct.price}</strong><a className="buyNow" href={`/produto/${featuredProduct.slug || featuredProduct.id}`}>VER DETALHES</a>{featuredWhatsapp && <ProductWhatsapp className="whatsappSecondary" contact={content.contact} product={featuredProduct}>FALAR SOBRE ESTA CAMISETA</ProductWhatsapp>}</div>
       {content.reviews.active && <div className="reviews"><h2>{content.reviews.title}</h2>{content.reviews.items.map((review) => <blockquote key={review.id}><div className="stars">★★★★★</div><p>“{review.text}”</p><cite>– {review.name}</cite></blockquote>)}</div>}
     </section>}
 

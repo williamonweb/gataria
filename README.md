@@ -72,3 +72,11 @@ Entre com o valor de CMS_USERNAME e CMS_PASSWORD. O usuário não é uma conta d
 Se o login funcionar e o catálogo falhar, confira a conexão DATABASE_URL. Nunca compartilhe a senha, o CMS_SECRET ou a URL completa do banco.
 
 Use a pasta principal deste ZIP como raiz do projeto. A cópia antiga que estava dentro de gataria-store/gataria-store foi removida para evitar publicar o site antigo por engano.
+
+## Disponibilidade e aviso de reposição
+
+No editor do produto, marque ou desmarque “Produto disponível”. Salve o rascunho e publique. Produtos antigos usam o estoque anterior para definir o estado inicial; nenhuma quantidade é exibida no catálogo.
+
+Ao clicar no WhatsApp de um produto indisponível, aparece um modal perguntando se o visitante quer ser avisado. Ao confirmar, o WhatsApp abre uma mensagem com o produto e as opções escolhidas. O visitante precisa enviar a mensagem; o aviso de reposição será feito pela equipe.
+
+O preço com desconto no Pix foi retirado do catálogo e do editor; o checkout também não calcula mais os 5% de desconto.

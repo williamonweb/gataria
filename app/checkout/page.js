@@ -200,7 +200,7 @@ export default function CheckoutPage() {
 
   const selectedShipping = shippingOptions[shipping];
   const shippingPrice = selectedShipping.price;
-  const pixDiscount = payment === 'pix' ? subtotal * 0.05 : 0;
+  const pixDiscount = 0;
   const total = Math.max(0, subtotal + shippingPrice - pixDiscount);
   const totalItems = cart.reduce((sum, item) => sum + Number(item.quantity || 1), 0);
 
@@ -471,9 +471,9 @@ export default function CheckoutPage() {
                 <span className="paymentIcon">◆</span>
                 <div>
                   <strong>PIX</strong>
-                  <small>Aprovação imediata e 5% de desconto.</small>
+                  <small>Pagamento via PIX.</small>
                 </div>
-                <b>−5%</b>
+                
               </label>
 
               <label className={`paymentOption ${payment === 'card' ? 'selected' : ''}`}>

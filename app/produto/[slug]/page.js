@@ -4,6 +4,8 @@ import { use, useEffect, useMemo, useState } from 'react';
 import { useSiteContent } from '../../content-context';
 import SiteHeader from '../../components/SiteHeader';
 import SiteFooter from '../../components/SiteFooter';
+import ProductWhatsapp from '../../components/ProductWhatsapp';
+import { isProductAvailable } from '../../../lib/product-availability';
 import ProductCard from '../../components/ProductCard';
 import { productWhatsappUrl } from '../../../lib/whatsapp';
 
@@ -27,7 +29,7 @@ export default function ProdutoPage({ params }) {
   const gallery = useMemo(() => product ? [...new Set([product.image, ...(product.gallery || [])].filter(Boolean))] : [], [product]);
   if (!product) return <main><SiteHeader/><section className="notFound"><h1>Produto não encontrado</h1><a href="/produtos">Voltar às camisetas</a></section><SiteFooter/></main>;
 
-  const stock = Math.max(0, Number(product.stock) || 0);
+  const stock = isProductAvailable(product);
   const whatsapp = productWhatsappUrl(content.contact, product, { model, color, size });
   const collection = content.collections.find((item) => item.id === product.collection);
   const related = content.products.filter((item) => item.active && item.id !== product.id && item.collection === product.collection).slice(0, 4);
@@ -39,14 +41,14 @@ export default function ProdutoPage({ params }) {
       <div className="gallery"><div className="thumbs">{gallery.map((image, index) => <button className={selectedImage === image ? 'selected' : ''} onClick={() => setSelectedImage(image)} key={`${image}-${index}`} aria-label={`Ver foto ${index + 1}`}><img src={image} alt=""/></button>)}</div><div className="mainPhoto"><img src={selectedImage || product.image} alt={product.name}/></div></div>
       <div className="productInfo">
         <span className="badge">{product.type}</span><h1>{product.name}</h1><div className="stars">★★★★★ <small>({product.rating || 0} avaliações)</small></div>
-        <div className="detailPrice">R$ {product.price}</div>{product.pix && <p className="detailPix">R$ {product.pix} no PIX</p>}<p>{product.description}</p>
+        <div className="detailPrice">R$ {product.price}</div><p>{product.description}</p>
         {product.models?.length > 0 && <Option title="MODELO" items={product.models} value={model} setValue={setModel}/>} 
         {product.colors?.length > 0 && <Option title="COR" items={product.colors} value={color} setValue={setColor}/>} 
         {product.sizes?.length > 0 && <Option title="TAMANHO" items={product.sizes} value={size} setValue={setSize}/>} 
-        <div className={stock ? 'stockAvailability' : 'stockAvailability out'}><span aria-hidden="true">{stock ? '✓' : '!'}</span>{stock ? `${stock} ${stock === 1 ? 'unidade disponível' : 'unidades disponíveis'} em estoque` : 'Produto temporariamente esgotado'}</div>
-        {whatsapp ? <a className="productWhatsapp" href={whatsapp} target="_blank" rel="noreferrer">◉ {content.contact.whatsappLabel || 'FALAR NO WHATSAPP'}</a> : <div className="whatsappPending"><strong>WHATSAPP EM CONFIGURAÇÃO</strong><span>O número de atendimento será disponibilizado em breve.</span></div>}
+        <div className={stock ? 'stockAvailability' : 'stockAvailability out'}><span aria-hidden="true">{stock ? '✓' : '!'}</span>{stock ? 'Disponível' : 'Indisponível'}</div>
+        {whatsapp ? <ProductWhatsapp contact={content.contact} product={product} options={{ model, color, size }}>◉ {content.contact.whatsappLabel || 'FALAR NO WHATSAPP'}</ProductWhatsapp> : <div className="whatsappPending"><strong>WHATSAPP EM CONFIGURAÇÃO</strong><span>O número de atendimento será disponibilizado em breve.</span></div>}
         <p className="catalogModeNote">Este site funciona como catálogo. O atendimento confirma disponibilidade, prazo e forma de pagamento.</p>
-        <div className="benefits"><span>💬 Atendimento direto</span><span>👕 Escolha modelo e tamanho</span><span>✓ Estoque visível</span></div>
+        <div className="benefits"><span>💬 Atendimento direto</span><span>👕 Escolha modelo e tamanho</span><span>✓ Disponibilidade informada</span></div>
       </div>
     </section>
     <section className="detailsSection shell"><h2>DETALHES DO PRODUTO</h2><div><p><strong>Descrição</strong><br/>{product.description}</p><p><strong>Material</strong><br/>{product.material || 'Consultar descrição'}</p><p><strong>Estampa</strong><br/>{product.print || 'Premium'}</p><p><strong>SKU</strong><br/>{product.sku || '—'}</p></div></section>
