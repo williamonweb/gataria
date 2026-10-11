@@ -72,13 +72,22 @@ export default function AdminPage() {
   }
 
   async function publish() {
+    let publishedContent = content;
+    if (editing !== null) {
+      if (!draft.name.trim() || !draft.gallery?.length) return flash('Informe o nome e pelo menos uma foto antes de publicar.', 'error');
+      const product = { ...draft, id: draft.id || `produto-${Date.now()}`, slug: draft.slug || slugify(draft.name), image: draft.gallery[0], gallery: draft.gallery };
+      publishedContent = { ...content, products: editing === 'new' ? [...content.products, product] : content.products.map((item) => item.id === editing ? product : item) };
+    }
     setPublishing(true);
     try {
-      const response = await fetch('/api/content', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
+      const response = await fetch('/api/content', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: publishedContent }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Não foi possível publicar.');
       setContent(normalizeContent(data.content));
-      flash('Alterações publicadas no catálogo.');
+      setEditing(null);
+      try { localStorage.setItem('gataria:published', String(Date.now())); } catch {}
+      window.dispatchEvent(new Event('gataria:published'));
+      flash('Alterações publicadas. O site atualiza automaticamente em até 5 segundos.');
     } catch (error) {
       flash(error.message, 'error');
       if (/sessão/i.test(error.message)) setAuth((value) => ({ ...value, authenticated: false }));
