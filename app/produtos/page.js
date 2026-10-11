@@ -1,12 +1,37 @@
 'use client';
-import { useEffect,useMemo,useState } from 'react';
-import { DEFAULT_CONTENT,STORAGE_KEY } from '../content';
-export default function ProdutosPage(){
- const [content,setContent]=useState(DEFAULT_CONTENT); const [search,setSearch]=useState(''); const [type,setType]=useState('Todos');
- useEffect(()=>{try{const s=localStorage.getItem(STORAGE_KEY);if(s)setContent({...DEFAULT_CONTENT,...JSON.parse(s)})}catch{}},[]);
- const types=['Todos',...new Set(content.products.filter(p=>p.active).map(p=>p.type||'Produto'))];
- const products=useMemo(()=>content.products.filter(p=>p.active&&(type==='Todos'||p.type===type)&&p.name.toLowerCase().includes(search.toLowerCase())),[content,search,type]);
- return <main><header className="simpleHeader"><a className="brand" href="/"><img src="/assets/logo-transparent.png"/><span>GATARIA</span></a><nav><a href="/">HOME</a><a className="active" href="/produtos">PRODUTOS</a><a href="/#colecoes">COLEÇÕES</a><a href="/admin">PAINEL</a></nav></header>
- <section className="catalogHero"><div className="shell"><p>ROCK • GEEK • STREETWEAR</p><h1>TODOS OS PRODUTOS</h1><span>Camisetas, canecas, moletons e muito mais.</span></div></section>
- <section className="catalog shell"><aside><h3>FILTRAR</h3><input placeholder="Buscar produto" value={search} onChange={e=>setSearch(e.target.value)}/>{types.map(t=><button className={type===t?'selected':''} onClick={()=>setType(t)} key={t}>{t}</button>)}</aside><div><div className="catalogTop"><strong>{products.length} PRODUTOS</strong></div><div className="productGrid">{products.map(p=><article className="productCard" key={p.id}><a href={`/produto/${p.slug||p.id}`}><div className="productImage"><img src={p.image} alt={p.name}/></div><h3>{p.name}</h3></a><small className="productType">{p.type}</small><div className="stars">★★★★★ <small>({p.rating||0})</small></div><strong>R$ {p.price}</strong><span className="pix">R$ {p.pix} no PIX</span><a className="cardButton" href={`/produto/${p.slug||p.id}`}>VER PRODUTO</a></article>)}</div></div></section></main>
+
+import { useEffect, useMemo, useState } from 'react';
+import { useSiteContent } from '../content-context';
+import SiteHeader from '../components/SiteHeader';
+import SiteFooter from '../components/SiteFooter';
+import ProductCard from '../components/ProductCard';
+
+export default function ProdutosPage() {
+  const content = useSiteContent();
+  const [search, setSearch] = useState('');
+  const [type, setType] = useState('Todos');
+  const [category, setCategory] = useState('Todas');
+
+  useEffect(() => {
+    const selected = new URLSearchParams(window.location.search).get('categoria');
+    if (selected) setCategory(selected);
+  }, []);
+
+  const activeProducts = content.products.filter((product) => product.active);
+  const types = ['Todos', ...new Set(activeProducts.map((product) => product.type || 'Camiseta'))];
+  const categories = ['Todas', ...new Set(activeProducts.map((product) => product.category).filter(Boolean))];
+  const products = useMemo(() => activeProducts.filter((product) => {
+    const matchesSearch = `${product.name} ${product.category} ${product.description}`.toLowerCase().includes(search.toLowerCase());
+    return matchesSearch && (type === 'Todos' || product.type === type) && (category === 'Todas' || product.category === category);
+  }), [activeProducts, category, search, type]);
+
+  return <main>
+    <SiteHeader/>
+    <section className="catalogHero"><div className="shell"><p>CATÁLOGO GATARIA</p><h1>NOSSAS CAMISETAS</h1><span>Explore as estampas, escolha seu modelo e fale com a gente.</span></div></section>
+    <section className="catalog shell">
+      <aside><h3>FILTRAR</h3><input aria-label="Buscar produto" placeholder="Buscar camiseta" value={search} onChange={(event) => setSearch(event.target.value)}/><label>TIPO</label>{types.map((item) => <button className={type === item ? 'selected' : ''} onClick={() => setType(item)} key={item}>{item}</button>)}<label>CATEGORIA</label>{categories.map((item) => <button className={category === item ? 'selected' : ''} onClick={() => setCategory(item)} key={item}>{item}</button>)}</aside>
+      <div><div className="catalogTop"><strong>{products.length} {products.length === 1 ? 'PRODUTO' : 'PRODUTOS'}</strong><span>Compra pelo WhatsApp em breve</span></div>{products.length ? <div className="productGrid">{products.map((product) => <ProductCard product={product} key={product.id}/>)}</div> : <div className="emptyResults"><h2>Nenhuma camiseta encontrada</h2><p>Tente limpar os filtros ou buscar outro nome.</p><button onClick={() => { setSearch(''); setType('Todos'); setCategory('Todas'); }}>LIMPAR FILTROS</button></div>}</div>
+    </section>
+    <SiteFooter/>
+  </main>;
 }

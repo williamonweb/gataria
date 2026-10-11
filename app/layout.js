@@ -1,14 +1,13 @@
 import './globals.css';
+import { ContentProvider } from './content-context';
+import { getSiteContent } from '../lib/content-store';
 
-export const metadata = {
-  title: 'Gataria | Rock, Geek & Streetwear',
-  description: 'Camisetas com atitude para quem vive música, cultura pop e streetwear.'
-};
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="pt-BR">
-      <body>{children}</body>
-    </html>
-  );
+export const dynamic = 'force-dynamic';
+export async function generateMetadata() {
+  const content = await getSiteContent();
+  return { title: content.seo.title, description: content.seo.description };
+}
+export default async function RootLayout({ children }) {
+  const content = await getSiteContent();
+  return <html lang="pt-BR"><body><ContentProvider initialContent={content}>{children}</ContentProvider></body></html>;
 }
