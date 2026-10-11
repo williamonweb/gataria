@@ -20,7 +20,6 @@ export default function ProdutoPage({ params }) {
 
   useEffect(() => {
     if (!product) return;
-    setSelectedImage(product.image);
     const nextColor = product.colors?.find((item) => isColorAvailable(product, item)) || '';
     setColor((current) => product.colors?.includes(current) && isColorAvailable(product, current) ? current : nextColor);
     setModel(product.models?.[0] || '');
@@ -31,7 +30,11 @@ export default function ProdutoPage({ params }) {
     setSize((current) => product.sizes?.includes(current) && isSizeAvailable(product, current, color) ? current : product.sizes?.find((item) => isSizeAvailable(product, item, color)) || '');
   }, [product, color]);
 
-  const gallery = useMemo(() => product ? [...new Set([product.image, ...(product.gallery || [])].filter(Boolean))] : [], [product]);
+  useEffect(() => {
+    if (product) setSelectedImage(product.colorImages?.[color] || product.image);
+  }, [product, color]);
+
+  const gallery = useMemo(() => product ? [...new Set([product.colorImages?.[color], product.image, ...(product.gallery || [])].filter(Boolean))] : [], [product, color]);
   if (!product) return <main><SiteHeader/><section className="notFound"><h1>Produto não encontrado</h1><a href="/produtos">Voltar às camisetas</a></section><SiteFooter/></main>;
 
   const stock = isProductAvailable(product);
