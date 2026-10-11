@@ -50,8 +50,8 @@ export default function AdminPage() {
     setContent(normalizeContent(data.content));
   }
 
-  async function login(password) {
-    const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+  async function login(username, password) {
+    const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Não foi possível entrar.');
     setAuth((value) => ({ ...value, authenticated: true }));
@@ -177,14 +177,15 @@ export default function AdminPage() {
 }
 
 function LoginScreen({ configured, login }) {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   async function submit(event) {
     event.preventDefault(); setBusy(true); setError('');
-    try { await login(password); } catch (loginError) { setError(loginError.message); } finally { setBusy(false); }
+    try { await login(username, password); } catch (loginError) { setError(loginError.message); } finally { setBusy(false); }
   }
-  return <main className="loginPage"><form className="loginCard" onSubmit={submit}><img src="/assets/logo-transparent.png" alt="Logo Gataria"/><small>PAINEL DE CONTEÚDO</small><h1>GATARIA CMS</h1><p>Entre para atualizar o catálogo, as coleções e o atendimento.</p>{configured ? <><label>Senha do painel<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoFocus required/></label>{error && <div className="loginError">{error}</div>}<button disabled={busy}>{busy ? 'ENTRANDO...' : 'ENTRAR NO PAINEL'}</button></> : <div className="loginError">Defina CMS_PASSWORD no ambiente de produção antes de acessar o painel.</div>}<a href="/">← Voltar ao catálogo</a></form></main>;
+  return <main className="loginPage"><form className="loginCard" onSubmit={submit}><img src="/assets/logo-transparent.png" alt="Logo Gataria"/><small>PAINEL DE CONTEÚDO</small><h1>GATARIA CMS</h1><p>Entre para atualizar o catálogo, as coleções e o atendimento.</p>{configured ? <><label>Usuário<input type="text" value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" autoCapitalize="none" autoFocus required/></label><label>Senha<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required/></label>{error && <div className="loginError">{error}</div>}<button disabled={busy}>{busy ? 'ENTRANDO...' : 'ENTRAR NO PAINEL'}</button></> : <div className="loginError">Defina CMS_USERNAME, CMS_PASSWORD e CMS_SECRET na Vercel antes de acessar o painel.</div>}<a href="/">← Voltar ao catálogo</a></form></main>;
 }
 
 function Dashboard({ stats, content, goTo, startNew }) {
@@ -235,7 +236,29 @@ function NavigationPanel({ content, setContent, update, updateList }) {
 
 function SocialPanel({ content, setContent, update }) {
   function updateReview(index, field, value) { setContent((current) => ({ ...current, reviews: { ...current.reviews, items: current.reviews.items.map((item, itemIndex) => itemIndex === index ? { ...item, [field]: value } : item) } })); }
-  return <div className="stack"><div className="panel"><div className="panelTitle"><span>REDES SOCIAIS</span><h2>Instagram</h2></div><ImageField label="Faixa de imagens" value={content.instagram.image} onChange={(value) => update('instagram', 'image', value)}/><div className="formGrid"><Field label="Usuário" value={content.instagram.username} onChange={(value) => update('instagram', 'username', value)}/><Field label="Link do perfil" value={content.instagram.url} onChange={(value) => update('instagram', 'url', value)}/></div><Toggle checked={content.instagram.active} onChange={(value) => update('instagram', 'active', value)} label="Exibir Instagram"/></div><div className="panel"><div className="panelTitle"><span>PROVA SOCIAL</span><h2>Avaliações</h2></div><Field label="Título da seção" value={content.reviews.title} onChange={(value) => update('reviews', 'title', value)}/><div className="reviewEditor">{content.reviews.items.map((review, index) => <div key={review.id}><Field label={`Depoimento ${index + 1}`} value={review.text} onChange={(value) => updateReview(index, 'text', value)}/><Field label="Nome" value={review.name} onChange={(value) => updateReview(index, 'name', value)}/></div>)}</div><Toggle checked={content.reviews.active} onChange={(value) => update('reviews', 'active', value)} label="Exibir avaliações"/></div></div>;
+  function changeInstagramItems(transform) {
+    setContent((current) => ({ ...current, instagram: { ...current.instagram, items: transform(current.instagram.items || []) } }));
+  }
+  function addInstagramItem() {
+    changeInstagramItems((items) => [...items, { id: `instagram-${Date.now()}`, image: '', url: '', alt: '' }]);
+  }
+  function updateInstagramItem(id, field, value) {
+    changeInstagramItems((items) => items.map((item) => item.id === id ? { ...item, [field]: value } : item));
+  }
+  function removeInstagramItem(id) {
+    changeInstagramItems((items) => items.filter((item) => item.id !== id));
+  }
+  function moveInstagramItem(index, direction) {
+    changeInstagramItems((items) => {
+      const copy = [...items];
+      const target = index + direction;
+      if (target < 0 || target >= copy.length) return copy;
+      [copy[index], copy[target]] = [copy[target], copy[index]];
+      return copy;
+    });
+  }
+  const instagramItems = content.instagram.items || [];
+  return <div className="stack"><div className="panel"><div className="panelTitle"><span>REDES SOCIAIS</span><h2>Instagram oficial</h2><p className="description">Cadastre o perfil real da Gataria e use fotos reais das publicações. Cada imagem pode abrir diretamente o post correspondente.</p></div><div className="formGrid"><Field label="Usuário do Instagram" value={content.instagram.username} placeholder="@gataria" onChange={(value) => update('instagram', 'username', value)}/><Field label="Link do perfil" value={content.instagram.url} placeholder="https://www.instagram.com/seuusuario/" onChange={(value) => update('instagram', 'url', value)}/></div><Toggle checked={content.instagram.active} onChange={(value) => update('instagram', 'active', value)} label="Exibir Instagram na página inicial"/></div><div className="panel"><div className="panelTitleRow"><div><span>PUBLICAÇÕES</span><h2>Galeria do Instagram</h2><p className="description">Adicione até 12 fotos. A ordem abaixo será a mesma exibida no site.</p></div><button className="newProduct" disabled={instagramItems.length >= 12} onClick={addInstagramItem}>+ NOVA FOTO</button></div>{instagramItems.length ? <div className="instagramEditor">{instagramItems.map((item, index) => <article className="instagramPostCard" key={item.id}><div className="instagramPostNumber">PUBLICAÇÃO {index + 1}</div><ImageField label="Imagem da publicação" value={item.image} onChange={(value) => updateInstagramItem(item.id, 'image', value)} hint="Use a foto real publicada no Instagram, de preferência quadrada."/><Field label="Link desta publicação" value={item.url} placeholder="https://www.instagram.com/p/.../" onChange={(value) => updateInstagramItem(item.id, 'url', value)}/><Field label="Descrição da imagem" value={item.alt} placeholder="Ex.: Camiseta Gataria Rock" onChange={(value) => updateInstagramItem(item.id, 'alt', value)}/><div className="instagramPostActions"><button disabled={index === 0} onClick={() => moveInstagramItem(index, -1)}>← VOLTAR</button><button disabled={index === instagramItems.length - 1} onClick={() => moveInstagramItem(index, 1)}>AVANÇAR →</button><button className="dangerButton" onClick={() => removeInstagramItem(item.id)}>EXCLUIR</button></div></article>)}</div> : <div className="emptyInstagram"><strong>Nenhuma publicação adicionada</strong><span>Clique em “Nova foto” para montar a galeria real da Gataria.</span></div>}</div><div className="panel"><div className="panelTitle"><span>PROVA SOCIAL</span><h2>Avaliações</h2></div><Field label="Título da seção" value={content.reviews.title} onChange={(value) => update('reviews', 'title', value)}/><div className="reviewEditor">{content.reviews.items.map((review, index) => <div key={review.id}><Field label={`Depoimento ${index + 1}`} value={review.text} onChange={(value) => updateReview(index, 'text', value)}/><Field label="Nome" value={review.name} onChange={(value) => updateReview(index, 'name', value)}/></div>)}</div><Toggle checked={content.reviews.active} onChange={(value) => update('reviews', 'active', value)} label="Exibir avaliações"/></div></div>;
 }
 
 function ContactPanel({ content, update }) {

@@ -1,4 +1,4 @@
-# Gataria Store v5 — Catálogo + WhatsApp + CMS
+# Gataria Store v5.1 — Catálogo + WhatsApp + CMS Neon
 
 Site da Gataria em Next.js preparado para a primeira fase do projeto: apresentar camisetas, organizar coleções e levar o visitante ao atendimento pelo WhatsApp. Carrinho e Mercado Pago ficaram fora da navegação pública e podem ser retomados em uma segunda etapa.
 
@@ -17,7 +17,7 @@ Acesse:
 - Coleções: http://localhost:3000/colecoes
 - CMS: http://localhost:3000/admin
 
-Em desenvolvimento local, a senha inicial do CMS é `gataria-admin`. Para usar outra, preencha `CMS_PASSWORD` no `.env.local`.
+Em desenvolvimento local, o acesso inicial do CMS é usuário `admin` e senha `gataria-admin`. Para trocar, preencha `CMS_USERNAME`, `CMS_PASSWORD` e `CMS_SECRET` no `.env.local`.
 
 ## Configurar o WhatsApp
 
@@ -36,6 +36,7 @@ O botão de cada camiseta abre uma conversa com nome, código, modelo, cor, tama
 - Coleções e suas páginas individuais.
 - Banner, manifesto e produto em destaque da home.
 - Menu, categorias, avaliações, Instagram e rodapé.
+- Perfil oficial do Instagram e galeria de publicações com links individuais.
 - WhatsApp, e-mail e horário de atendimento.
 - Páginas institucionais e SEO.
 - Backup e restauração do conteúdo em JSON.
@@ -47,9 +48,12 @@ Localmente, o CMS grava o conteúdo em `data/site-content.json`. Em produção, 
 Também defina em produção:
 
 ```env
+CMS_USERNAME=seu-usuario
 CMS_PASSWORD=uma-senha-forte
 CMS_SECRET=um-texto-longo-e-aleatorio
 ```
+
+As credenciais ficam nas variáveis protegidas da Vercel, e não dentro do banco. O Neon armazena o conteúdo publicado pelo CMS, incluindo produtos, coleções, textos, configurações e a galeria do Instagram.
 
 Sem `DATABASE_URL`, a versão publicada continua exibindo o conteúdo padrão e bloqueia alterações do CMS para evitar a falsa impressão de que os dados foram salvos.
 

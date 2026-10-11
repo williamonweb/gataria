@@ -13,6 +13,7 @@ export default function Home() {
   const featuredProduct = content.products.find((item) => item.id === content.featured.productId && item.active) || products[0];
   const generalWhatsapp = whatsappUrl(content.contact);
   const featuredWhatsapp = productWhatsappUrl(content.contact, featuredProduct);
+  const instagramItems = (content.instagram.items || []).filter((item) => item.image);
 
   return <main>
     <SiteHeader/>
@@ -52,7 +53,7 @@ export default function Home() {
 
     <section className="whatsappBand shell"><div><small>ATENDIMENTO DIRETO</small><h2>GOSTOU DE UMA CAMISETA?</h2><p>Chame a Gataria no WhatsApp para tirar dúvidas e combinar seu pedido.</p></div>{generalWhatsapp ? <a href={generalWhatsapp} target="_blank" rel="noreferrer">◉ ABRIR WHATSAPP</a> : <span>Cadastre o número no painel CMS</span>}</section>
 
-    {content.instagram.active && <section className="instagram shell"><div className="sectionTitle"><h2>NOSSO INSTAGRAM</h2><span>{content.instagram.username}</span><a href={content.instagram.url || '#'} target="_blank" rel="noreferrer">VER PERFIL →</a></div><img src={content.instagram.image} alt={`Galeria do Instagram ${content.instagram.username}`}/></section>}
+    {content.instagram.active && <section className="instagram shell"><div className="sectionTitle"><div><small>ACOMPANHE A GATARIA</small><h2>NOSSO INSTAGRAM</h2></div><span>{content.instagram.username}</span><a href={content.instagram.url || '#'} target="_blank" rel="noreferrer">SEGUIR PERFIL →</a></div>{instagramItems.length ? <div className="instagramGrid">{instagramItems.map((item) => <a href={item.url || content.instagram.url || '#'} target="_blank" rel="noreferrer" key={item.id}><img src={item.image} alt={item.alt || `Publicação do Instagram ${content.instagram.username}`}/><span aria-hidden="true">◎</span></a>)}</div> : content.instagram.image ? <a className="instagramLegacy" href={content.instagram.url || '#'} target="_blank" rel="noreferrer"><img src={content.instagram.image} alt={`Galeria do Instagram ${content.instagram.username}`}/></a> : null}</section>}
     <SiteFooter/>
   </main>;
 }

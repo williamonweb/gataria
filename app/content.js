@@ -58,7 +58,13 @@ export const DEFAULT_CONTENT = {
       { id: 'review-3', text: 'Já comprei três e vou comprar mais!', name: 'Rafael T.' },
     ],
   },
-  instagram: { image: '/assets/instagram.jpg', username: '@gataria', url: 'https://instagram.com/', active: true },
+  instagram: {
+    image: '/assets/instagram.jpg',
+    username: '@gataria',
+    url: 'https://instagram.com/',
+    active: true,
+    items: [],
+  },
   contact: {
     whatsapp: '',
     whatsappLabel: 'FALAR NO WHATSAPP',
@@ -100,6 +106,12 @@ export function slugify(value = '') {
 export function normalizeContent(value = {}) {
   const source = value && typeof value === 'object' ? value : {};
   const merge = (key) => ({ ...DEFAULT_CONTENT[key], ...(source[key] || {}) });
+  const instagram = merge('instagram');
+  instagram.items = Array.isArray(source.instagram?.items)
+    ? source.instagram.items
+        .filter((item) => item && typeof item === 'object')
+        .map((item, index) => ({ id: item.id || `instagram-${index + 1}`, image: item.image || '', url: item.url || '', alt: item.alt || '' }))
+    : DEFAULT_CONTENT.instagram.items;
   return {
     ...DEFAULT_CONTENT,
     ...source,
@@ -108,7 +120,7 @@ export function normalizeContent(value = {}) {
     statement: merge('statement'),
     featured: merge('featured'),
     reviews: { ...DEFAULT_CONTENT.reviews, ...(source.reviews || {}), items: Array.isArray(source.reviews?.items) ? source.reviews.items : DEFAULT_CONTENT.reviews.items },
-    instagram: merge('instagram'),
+    instagram,
     contact: merge('contact'),
     footer: merge('footer'),
     seo: merge('seo'),

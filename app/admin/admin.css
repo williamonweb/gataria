@@ -2,3 +2,22 @@
 @media(max-width:1150px){.adminPage{grid-template-columns:230px 1fr}.adminContent{padding:28px 22px}.statsGrid{grid-template-columns:repeat(2,1fr)}.dashboardGrid{grid-template-columns:1fr}.productTable{overflow:auto}.tableHead,.tableRow{min-width:900px}.galleryAdminGrid{grid-template-columns:repeat(3,1fr)}.reviewEditor{grid-template-columns:1fr}.headerButtons{justify-content:flex-start}.adminHeader{align-items:flex-start;flex-direction:column}}
 @media(max-width:820px){.adminPage{grid-template-columns:1fr}.adminSidebar{position:relative;height:auto;padding:16px}.adminSidebar nav{grid-template-columns:repeat(3,1fr)}.adminSidebar nav button{justify-content:center;text-align:center;flex-direction:column;gap:3px;padding:9px 5px;font-size:9px}.sidebarFooter{grid-template-columns:1fr 1fr;margin-top:12px}.adminContent{padding:20px 14px 50px}.formGrid,.adminCards{grid-template-columns:1fr}.galleryAdminGrid{grid-template-columns:repeat(2,1fr)}.listEditorRow,.listEditorRow.categoryRow{grid-template-columns:1fr 1fr}.listEditorRow .toggle{justify-self:start}.imageActions{grid-template-columns:1fr}.panel{padding:18px}}
 @media(max-width:520px){.adminSidebar nav{grid-template-columns:repeat(2,1fr)}.statsGrid{grid-template-columns:1fr}.adminHeader h1{font-size:27px}.headerButtons>*{flex:1;text-align:center}.panelTitleRow,.galleryHeader{flex-direction:column;align-items:stretch}.galleryAdminGrid{grid-template-columns:1fr 1fr}.galleryAdminItem>img{height:130px}.urlAdder{grid-template-columns:1fr}.urlAdder button{padding:11px}.checkRow{display:grid;gap:4px}.setupCheck{grid-template-columns:38px 1fr}.setupCheck button{grid-column:2}.listEditorRow,.listEditorRow.categoryRow{grid-template-columns:1fr}.cardFooter{align-items:flex-start;flex-direction:column;gap:10px}}
+
+/* Instagram real e autenticação por usuário + senha */
+.newProduct:disabled,.saveProduct:disabled{cursor:not-allowed;opacity:.45}
+.instagramEditor{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.instagramPostCard{min-width:0;background:#090909;border:1px solid #2b2b2b;border-radius:10px;padding:13px}
+.instagramPostNumber{color:#eab500;font-size:8px;font-weight:900;letter-spacing:1.4px}
+.instagramPostCard .imageField{margin:11px 0}
+.instagramPostCard .preview{height:auto;aspect-ratio:1}
+.instagramPostCard .imageActions{grid-template-columns:1fr}
+.instagramPostActions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.instagramPostActions>button{flex:1;background:#171717;border:1px solid #3b3b3b;color:#ddd;border-radius:5px;padding:8px;font-size:7px;font-weight:900}
+.instagramPostActions>button:disabled{opacity:.3}
+.instagramPostActions .dangerButton{color:#ef777e;border-color:#633037}
+.emptyInstagram{min-height:170px;margin-top:20px;border:1px dashed #3b3b3b;border-radius:9px;display:grid;place-items:center;align-content:center;gap:7px;color:#777;text-align:center}
+.emptyInstagram strong{color:#bbb}
+.emptyInstagram span{font-size:10px}
+.loginCard label{margin-top:18px}
+@media(max-width:1150px){.instagramEditor{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.instagramEditor{grid-template-columns:1fr}}
