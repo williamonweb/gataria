@@ -80,8 +80,9 @@ export default function AdminPage() {
     }
     setPublishing(true);
     try {
+      publishedContent = await uploadContentImages(publishedContent);
       const response = await fetch('/api/content', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: publishedContent }) });
-      const data = await response.json();
+      const data = await parsePublishResponse(response);
       if (!response.ok) throw new Error(data.error || 'Não foi possível publicar.');
       setContent(normalizeContent(data.content));
       setEditing(null);
@@ -309,4 +310,28 @@ function ListField({ label, items, onChange }) {
     setText(value);
     onChange([...new Set(value.split(',').map((item) => item.trim()).filter(Boolean))]);
   }} onBlur={() => setText(items.join(', '))}/></label>;
+}
+
+async function parsePublishResponse(response) {
+  const text = await response.text();
+  if (response.status === 413) throw new Error('O envio ficou muito grande. Reduza o tamanho das fotos e tente novamente.');
+  try { return JSON.parse(text); } catch { throw new Error('Não foi possível concluir o envio. Tente publicar novamente.'); }
+}
+async function uploadContentImages(content) {
+  const uploaded = new Map();
+  async function visit(value) {
+    if (typeof value === 'string' && value.startsWith('data:image/')) {
+      if (!uploaded.has(value)) {
+        const response = await fetch('/api/images', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: value }) });
+        const data = await parsePublishResponse(response);
+        if (!response.ok || !data.url) throw new Error(data.error || 'Não foi possível salvar uma foto.');
+        uploaded.set(value, data.url);
+      }
+      return uploaded.get(value);
+    }
+    if (Array.isArray(value)) { const result = []; for (const item of value) result.push(await visit(item)); return result; }
+    if (value && typeof value === 'object') { const result = {}; for (const [key, item] of Object.entries(value)) result[key] = await visit(item); return result; }
+    return value;
+  }
+  return visit(content);
 }
