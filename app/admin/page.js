@@ -25,6 +25,9 @@ async function compressImage(file, maxWidth = 1400, quality = 0.78) {
 export default function AdminPage() {
   const [auth, setAuth] = useState({ loading: true, authenticated: false, configured: true });
   const [content, setContent] = useState(DEFAULT_CONTENT);
+  const [contentReady, setContentReady] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
+  const [contentError, setContentError] = useState('');
   const [tab, setTab] = useState('dashboard');
   const [editing, setEditing] = useState(null);
   const [draft, setDraft] = useState(EMPTY_PRODUCT);
@@ -38,17 +41,25 @@ export default function AdminPage() {
     try {
       const session = await fetch('/api/admin/session', { cache: 'no-store' }).then((response) => response.json());
       setAuth({ loading: false, ...session });
-      if (session.authenticated) await loadContent();
+      if (session.authenticated) { try { await loadContent(); } catch {} }
     } catch {
       setAuth({ loading: false, authenticated: false, configured: true });
     }
   }
 
   async function loadContent() {
-    const response = await fetch('/api/content', { cache: 'no-store' });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Não foi possível carregar o conteúdo.');
-    setContent(normalizeContent(data.content));
+    setContentLoading(true);
+    setContentError('');
+    try {
+      const response = await fetch('/api/content', { cache: 'no-store' });
+      const data = await parsePublishResponse(response);
+      if (!response.ok || !data.content) throw new Error(data.error || 'Não foi possível carregar o catálogo.');
+      setContent(normalizeContent(data.content));
+      setContentReady(true);
+    } catch (error) {
+      setContentError(error.message || 'Não foi possível carregar o catálogo.');
+      throw error;
+    } finally { setContentLoading(false); }
   }
 
   async function login(username, password) {
@@ -64,6 +75,8 @@ export default function AdminPage() {
   async function logout() {
     await fetch('/api/admin/session', { method: 'DELETE' });
     setAuth((value) => ({ ...value, authenticated: false }));
+    setContentReady(false);
+    setContentError('');
   }
 
   function flash(text, tone = 'success') {
@@ -116,7 +129,7 @@ export default function AdminPage() {
     setEditing(product.id);
   }
   function productField(name, value) {
-    setDraft((current) => ({ ...current, [name]: value, ...(name === 'name' && !current.slug ? { slug: slugify(value) } : {}) }));
+    setDraft((current) => ({ ...current, [name]: value, ...(name === 'name' ? { slug: slugify(value) } : {}) }));
   }
   function saveProduct() {
     if (!draft.name.trim() || !draft.gallery?.length) return flash('Informe o nome e pelo menos uma foto.', 'error');
@@ -151,6 +164,8 @@ export default function AdminPage() {
 
   if (auth.loading) return <div className="adminLoading"><span className="adminSpinner"/>Carregando painel...</div>;
   if (!auth.authenticated) return <LoginScreen configured={auth.configured} login={login}/>;
+  if (contentLoading || (!contentReady && !contentError)) return <div className="adminLoading" role="status"><span className="adminSpinner"/>Carregando seu catálogo...</div>;
+  if (!contentReady) return <div className="adminLoading"><div className="panel"><h2>Não foi possível abrir o catálogo</h2><p>{contentError}</p><button className="primary" onClick={() => loadContent().catch(() => {})}>TENTAR NOVAMENTE</button><button className="secondary" onClick={logout}>SAIR</button></div></div>;
 
   const stats = {
     products: content.products.length,
