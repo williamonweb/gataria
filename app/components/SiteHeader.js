@@ -26,5 +26,8 @@ export default function SiteHeader() {
         ? <a className="headerWhatsapp" href={whatsapp} target="_blank" rel="noreferrer">◉ WHATSAPP</a>
         : <a className="headerWhatsapp setup" href="/pagina/contato">CONTATO</a>}
     </header>
+    <section className="ecommerceNotice" aria-label="Novidades da Gataria">
+      <div className="shell"><span className="ecommerceNoticeIcon" aria-hidden="true">🛍️</span><div><strong>Em breve, a Gataria terá compra online!</strong><p>Estamos preparando nosso e-commerce. Por enquanto, escolha sua camiseta e faça seu pedido pelo WhatsApp.</p></div></div>
+    </section>
   </>;
 }
